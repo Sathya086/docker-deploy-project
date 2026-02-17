@@ -11,4 +11,4 @@ COPY pythonapp.py .
 # RUN pip install --no-cache-dir -r requirements.txt
 
 # Set default command to run the app
-CMD ["python", "pythonapp"]
+CMD ["python", "pythonapp.py"]
