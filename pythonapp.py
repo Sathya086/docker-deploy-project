@@ -1,4 +1,3 @@
-# pythonapp.py
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
@@ -10,9 +9,12 @@ def view_tasks():
 
 @app.route("/tasks", methods=["POST"])
 def add_task():
-    task = request.json.get("task")
-    tasks.append(task)
-    return jsonify({"message": "Task added"}), 201
+    data = request.json
+    task = data.get("task")
+    if task:
+        tasks.append(task)
+        return jsonify({"message": "Task added"}), 201
+    return jsonify({"error": "Task not provided"}), 400
 
 @app.route("/tasks/<int:index>", methods=["DELETE"])
 def remove_task(index):
