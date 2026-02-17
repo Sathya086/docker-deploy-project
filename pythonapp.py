@@ -1,21 +1,20 @@
-from flask import Flask, request, jsonify, render_template_string
+from flask import Flask, request, render_template_string
 
 app = Flask(__name__)
 tasks = []
 
-# Simple HTML UI
 HTML_PAGE = """
 <!doctype html>
 <title>To-Do List</title>
 <h1>To-Do List App</h1>
-<form action="/tasks" method="post">
-  <input type="text" name="task" placeholder="New task" required>
-  <input type="submit" value="Add Task">
+<form method="post" action="/add">
+    <input type="text" name="task" placeholder="New task" required>
+    <input type="submit" value="Add Task">
 </form>
 <ul>
 {% for i, task in enumerate(tasks) %}
   <li>{{ task }} 
-      <a href="/tasks/delete/{{ i }}">[Delete]</a>
+      <a href="/delete/{{ i }}">[Delete]</a>
   </li>
 {% endfor %}
 </ul>
@@ -25,25 +24,15 @@ HTML_PAGE = """
 def home():
     return render_template_string(HTML_PAGE, tasks=tasks)
 
-@app.route("/tasks", methods=["GET"])
-def view_tasks():
-    return jsonify(tasks)
-
-@app.route("/tasks", methods=["POST"])
+@app.route("/add", methods=["POST"])
 def add_task():
-    # Handle form submission from UI
-    if request.form:
-        task = request.form.get("task")
-    else:
-        data = request.json
-        task = data.get("task")
+    task = request.form.get("task")
     if task:
         tasks.append(task)
-        return render_template_string(HTML_PAGE, tasks=tasks)
-    return jsonify({"error": "Task not provided"}), 400
+    return render_template_string(HTML_PAGE, tasks=tasks)
 
-@app.route("/tasks/delete/<int:index>", methods=["GET"])
-def remove_task(index):
+@app.route("/delete/<int:index>", methods=["GET"])
+def delete_task(index):
     if 0 <= index < len(tasks):
         tasks.pop(index)
     return render_template_string(HTML_PAGE, tasks=tasks)
