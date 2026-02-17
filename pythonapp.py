@@ -1,45 +1,25 @@
-def show_menu():
-    print("\n--- To-Do List App ---")
-    print("1. View Tasks")
-    print("2. Add Task")
-    print("3. Remove Task")
-    print("4. Exit")
+# pythonapp.py
+from flask import Flask, request, jsonify
 
+app = Flask(__name__)
 tasks = []
 
-while True:
-    show_menu()
-    choice = input("Choose an option (1-4): ")
+@app.route("/tasks", methods=["GET"])
+def view_tasks():
+    return jsonify(tasks)
 
-    if choice == "1":
-        if not tasks:
-            print("No tasks yet!")
-        else:
-            print("\nYour Tasks:")
-            for i, task in enumerate(tasks, start=1):
-                print(f"{i}. {task}")
+@app.route("/tasks", methods=["POST"])
+def add_task():
+    task = request.json.get("task")
+    tasks.append(task)
+    return jsonify({"message": "Task added"}), 201
 
-    elif choice == "2":
-        task = input("Enter a new task: ")
-        tasks.append(task)
-        print("Task added!")
+@app.route("/tasks/<int:index>", methods=["DELETE"])
+def remove_task(index):
+    if 0 <= index < len(tasks):
+        removed = tasks.pop(index)
+        return jsonify({"message": f"Removed task: {removed}"})
+    return jsonify({"error": "Invalid index"}), 400
 
-    elif choice == "3":
-        if not tasks:
-            print("No tasks to remove!")
-        else:
-            for i, task in enumerate(tasks, start=1):
-                print(f"{i}. {task}")
-            try:
-                task_num = int(input("Enter task number to remove: "))
-                removed = tasks.pop(task_num - 1)
-                print(f"Removed task: {removed}")
-            except (ValueError, IndexError):
-                print("Invalid task number!")
-
-    elif choice == "4":
-        print("Goodbye!")
-        break
-
-    else:
-        print("Invalid choice! Please select 1-4.")
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=3000)
