@@ -4,7 +4,7 @@ FROM python:3.12-slim
 # Set working directory inside the container
 WORKDIR /usr/src/app
 
-# Copy the Python app into the container
+# Copy the Python app into the container 12
 COPY pythonapp.py .
 
 # (Optional) Install any Python dependencies if needed
