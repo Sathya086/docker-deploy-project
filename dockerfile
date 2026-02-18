@@ -1,14 +1,17 @@
-# Use the official Python base image
 FROM python:3.12-slim
 
-# Set working directory inside the container
 WORKDIR /usr/src/app
 
-# Copy the Python app into the container 12
+<<<<<<< HEAD
+# Copy the Python app into the container 
+=======
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application
+>>>>>>> b0187715b9db5cef85b11f28a1e77d9c4cfd582b
 COPY pythonapp.py .
 
-# (Optional) Install any Python dependencies if needed
-# RUN pip install --no-cache-dir -r requirements.txt
-
-# Set default command to run the app
-CMD ["python", "pythonapp"]
+# Run app
+CMD ["python", "pythonapp.py"]

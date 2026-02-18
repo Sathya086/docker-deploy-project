@@ -1,45 +1,44 @@
-def show_menu():
-    print("\n--- To-Do List App ---")
-    print("1. View Tasks")
-    print("2. Add Task")
-    print("3. Remove Task")
-    print("4. Exit")
+from flask import Flask, request, jsonify, render_template_string
 
+app = Flask(__name__)
 tasks = []
 
-while True:
-    show_menu()
-    choice = input("Choose an option (1-4): ")
+HTML_PAGE = """
+<!doctype html>
+<title>To-Do List</title>
+<h1>To-Do List</h1>
+<ul>
+{% for task in tasks %}
+  <li>{{ loop.index0 }} - {{ task }}</li>
+{% else %}
+  <li>No tasks yet!</li>
+{% endfor %}
+</ul>
+"""
 
-    if choice == "1":
-        if not tasks:
-            print("No tasks yet!")
-        else:
-            print("\nYour Tasks:")
-            for i, task in enumerate(tasks, start=1):
-                print(f"{i}. {task}")
+@app.route("/")
+def home():
+    return render_template_string(HTML_PAGE, tasks=tasks)
 
-    elif choice == "2":
-        task = input("Enter a new task: ")
+@app.route("/tasks", methods=["GET"])
+def view_tasks():
+    return jsonify(tasks)
+
+@app.route("/tasks", methods=["POST"])
+def add_task():
+    data = request.json
+    task = data.get("task")
+    if task:
         tasks.append(task)
-        print("Task added!")
+        return jsonify({"message": "Task added"}), 201
+    return jsonify({"error": "Task not provided"}), 400
 
-    elif choice == "3":
-        if not tasks:
-            print("No tasks to remove!")
-        else:
-            for i, task in enumerate(tasks, start=1):
-                print(f"{i}. {task}")
-            try:
-                task_num = int(input("Enter task number to remove: "))
-                removed = tasks.pop(task_num - 1)
-                print(f"Removed task: {removed}")
-            except (ValueError, IndexError):
-                print("Invalid task number!")
+@app.route("/tasks/<int:index>", methods=["DELETE"])
+def remove_task(index):
+    if 0 <= index < len(tasks):
+        removed = tasks.pop(index)
+        return jsonify({"message": f"Removed task: {removed}"})
+    return jsonify({"error": "Invalid index"}), 400
 
-    elif choice == "4":
-        print("Goodbye!")
-        break
-
-    else:
-        print("Invalid choice! Please select 1-4.")
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=3000)
